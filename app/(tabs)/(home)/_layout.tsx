@@ -18,7 +18,7 @@ export default function HomeLayout() {
       <Stack.Screen 
         name="home" 
         options={{ 
-          title: "CalmReflect",
+          title: "Breath Happiness",
           headerShown: false,
         }} 
       />

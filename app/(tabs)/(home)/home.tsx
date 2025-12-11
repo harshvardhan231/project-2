@@ -149,7 +149,7 @@ export default function HomeScreen() {
         >
           <View style={styles.header}>
             <View>
-              <Text style={styles.appTitle}>CalmReflect</Text>
+              <Text style={styles.appTitle}>Breath Happiness</Text>
               <Text style={styles.greeting}>{greeting}, {user?.name || "there"}</Text>
             </View>
             <TouchableOpacity 

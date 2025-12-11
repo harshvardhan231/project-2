@@ -327,7 +327,7 @@ export default function OnboardingScreen() {
       </View>
 
       <TouchableOpacity style={styles.startButton} onPress={handleComplete}>
-        <Text style={styles.startButtonText}>Start Using CalmReflect</Text>
+        <Text style={styles.startButtonText}>Start Using Breath Happiness</Text>
       </TouchableOpacity>
     </Animated.View>
   );

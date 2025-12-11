@@ -30,7 +30,7 @@ export default function ExportScreen() {
       };
 
       const jsonString = JSON.stringify(data, null, 2);
-      const fileName = `calmreflect-export-${Date.now()}.json`;
+      const fileName = `breath-happiness-export-${Date.now()}.json`;
       
       if (Platform.OS === "web") {
         const blob = new Blob([jsonString], { type: "application/json" });
