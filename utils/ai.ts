@@ -1,11 +1,13 @@
 import { JournalEntry, LLMSummary, CheckIn } from "@/types";
+import Constants from 'expo-constants';
 
-const GEMINI_API_KEY = process.env.EXPO_PUBLIC_GEMINI_API_KEY;
+const GEMINI_API_KEY = Constants.expoConfig?.extra?.EXPO_PUBLIC_GEMINI_API_KEY || process.env.EXPO_PUBLIC_GEMINI_API_KEY;
 
 console.log('[AI] Environment check:', {
   hasKey: !!GEMINI_API_KEY,
   keyLength: GEMINI_API_KEY?.length,
-  allEnvKeys: Object.keys(process.env).filter(k => k.startsWith('EXPO_PUBLIC'))
+  expoConfig: !!Constants.expoConfig?.extra,
+  processEnv: !!process.env.EXPO_PUBLIC_GEMINI_API_KEY
 });
 
 const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
