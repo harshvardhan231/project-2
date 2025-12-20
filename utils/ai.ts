@@ -1,10 +1,56 @@
 import { JournalEntry, LLMSummary, CheckIn } from "@/types";
 
-const API_URL = "https://toolkit.rork.com/text/llm/";
+const GEMINI_API_KEY = process.env.EXPO_PUBLIC_GEMINI_API_KEY;
+const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
 
 export interface AIChatMessage {
   role: "user" | "assistant";
   content: string;
+}
+
+async function callGemini(messages: { role: string; content: string }[]): Promise<string> {
+  if (!GEMINI_API_KEY) {
+    throw new Error("Gemini API key is not configured");
+  }
+
+  const systemMessage = messages.find(m => m.role === "system");
+  const otherMessages = messages.filter(m => m.role !== "system");
+
+  const contents = otherMessages.map(msg => ({
+    role: msg.role === "assistant" ? "model" : "user",
+    parts: [{ text: msg.content }]
+  }));
+
+  const requestBody: any = {
+    contents,
+    generationConfig: {
+      temperature: 0.7,
+      maxOutputTokens: 1000,
+    }
+  };
+
+  if (systemMessage) {
+    requestBody.systemInstruction = {
+      parts: [{ text: systemMessage.content }]
+    };
+  }
+
+  const response = await fetch(GEMINI_API_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(requestBody),
+  });
+
+  if (!response.ok) {
+    const error = await response.text();
+    console.error("Gemini API error:", error);
+    throw new Error("Failed to call Gemini API");
+  }
+
+  const data = await response.json();
+  return data.candidates[0]?.content?.parts[0]?.text || "";
 }
 
 export async function generateSummary(entries: JournalEntry[]): Promise<LLMSummary> {
@@ -25,25 +71,10 @@ export async function generateSummary(entries: JournalEntry[]): Promise<LLMSumma
   const userPrompt = `Please summarize these journal entries and provide insights:\n\n${entriesText}`;
 
   try {
-    const response = await fetch(API_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: userPrompt },
-        ],
-      }),
-    });
-
-    if (!response.ok) {
-      throw new Error("Failed to generate summary");
-    }
-
-    const data = await response.json();
-    const completion = data.completion;
+    const completion = await callGemini([
+      { role: "system", content: systemPrompt },
+      { role: "user", content: userPrompt },
+    ]);
 
     const lines = completion.split("\n");
     const summary = lines[0] || "Unable to generate summary.";
@@ -78,25 +109,10 @@ export async function generateCheckinResponse(mood: string, thought: string): Pr
   const userPrompt = `I'm feeling ${mood}. ${thought}`;
 
   try {
-    const response = await fetch(API_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: userPrompt },
-        ],
-      }),
-    });
-
-    if (!response.ok) {
-      throw new Error("Failed to generate response");
-    }
-
-    const data = await response.json();
-    return data.completion;
+    return await callGemini([
+      { role: "system", content: systemPrompt },
+      { role: "user", content: userPrompt },
+    ]);
   } catch (error) {
     console.error("Error calling AI API:", error);
     return "Thank you for sharing how you're feeling. Remember to be gentle with yourself today. 💙";
@@ -174,20 +190,7 @@ ${checkinsContext || 'No recent check-ins'}`;
     
     console.log("[AI] Sending message with", messages.length, "messages in context");
     
-    const response = await fetch(API_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ messages }),
-    });
-
-    if (!response.ok) {
-      throw new Error("Failed to generate insight");
-    }
-
-    const data = await response.json();
-    return data.completion;
+    return await callGemini(messages);
   } catch (error) {
     console.error("Error generating personalized insight:", error);
     return "I'm having trouble analyzing your data right now. Please try again later.";
