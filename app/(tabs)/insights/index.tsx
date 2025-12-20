@@ -584,6 +584,8 @@ export default function InsightsScreen() {
     const isUser = message.role === "user";
     const userMessageForJournal = messages.find(m => m.role === "user" && messages.indexOf(m) === messages.indexOf(message) - 1);
     
+    const MessageBubble = isUser ? View : GlassCard;
+    
     return (
       <View key={message.id} style={[styles.messageContainer, isUser && styles.userMessageContainer]}>
         <View style={[styles.messageIcon, isUser && styles.userMessageIcon]}>
@@ -593,7 +595,7 @@ export default function InsightsScreen() {
             <Bot size={16} color={colors.white} />
           )}
         </View>
-        <GlassCard style={[
+        <MessageBubble style={[
           styles.messageBubble, 
           isUser && styles.userMessageBubble,
           message.isError && styles.errorMessageBubble
@@ -638,7 +640,7 @@ export default function InsightsScreen() {
               minute: "2-digit" 
             })}
           </Text>
-        </GlassCard>
+        </MessageBubble>
       </View>
     );
   };
@@ -939,11 +941,16 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   userMessageBubble: {
-    backgroundColor: "rgba(139, 92, 246, 0.9)",
+    backgroundColor: "#8B5CF6",
     borderRadius: 16,
     borderBottomLeftRadius: 16,
     borderBottomRightRadius: 4,
-    borderWidth: 0,
+    padding: 12,
+    shadowColor: "#8B5CF6",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 2,
   },
   errorMessageBubble: {
     borderWidth: 1,
