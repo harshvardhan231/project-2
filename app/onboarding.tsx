@@ -16,11 +16,11 @@ import { colors } from "@/constants/colors";
 import { useUser } from "@/providers/UserProvider";
 import * as Haptics from "expo-haptics";
 
-const STEPS = ["value", "name", "permissions", "breathing", "greeting"] as const;
+const STEPS = ["disclaimer", "value", "name", "permissions", "breathing", "greeting"] as const;
 type Step = (typeof STEPS)[number];
 
 export default function OnboardingScreen() {
-  const [currentStep, setCurrentStep] = useState<Step>("value");
+  const [currentStep, setCurrentStep] = useState<Step>("disclaimer");
   const [name, setName] = useState("");
   const { setUser, setHasCompletedOnboarding } = useUser();
   
@@ -71,46 +71,47 @@ export default function OnboardingScreen() {
 
 
 
-  const startBreathingSequence = () => {
+
+
+  const startBreathingSequence = useCallback(() => {
     Animated.timing(breatheOpacity, {
       toValue: 1,
       duration: 500,
       useNativeDriver: true,
     }).start();
 
-    setTimeout(() => breatheIn(), 500);
-  };
-
-  const breatheIn = () => {
-    setBreathePhase("in");
-    playVoice("Breathe In");
-    
-    Animated.timing(breatheScale, {
-      toValue: 1,
-      duration: 4000,
-      useNativeDriver: true,
-    }).start(() => {
-      setTimeout(() => hold(), 500);
-    });
-  };
-
-  const hold = () => {
-    setBreathePhase("hold");
-    setTimeout(() => breatheOut(), 2000);
-  };
-
-  const breatheOut = () => {
-    setBreathePhase("out");
-    playVoice("Breathe Out");
-    
-    Animated.timing(breatheScale, {
-      toValue: 0.3,
-      duration: 6000,
-      useNativeDriver: true,
-    }).start(() => {
-      setTimeout(() => handleNext(), 500);
-    });
-  };
+    setTimeout(() => {
+      setBreathePhase("in");
+      playVoice("Breathe In");
+      
+      Animated.timing(breatheScale, {
+        toValue: 1,
+        duration: 4000,
+        useNativeDriver: true,
+      }).start(() => {
+        setTimeout(() => {
+          setBreathePhase("hold");
+          setTimeout(() => {
+            setBreathePhase("out");
+            playVoice("Breathe Out");
+            
+            Animated.timing(breatheScale, {
+              toValue: 0.3,
+              duration: 6000,
+              useNativeDriver: true,
+            }).start(() => {
+              setTimeout(() => {
+                const currentIndex = STEPS.indexOf("breathing");
+                if (currentIndex < STEPS.length - 1) {
+                  setCurrentStep(STEPS[currentIndex + 1]);
+                }
+              }, 500);
+            });
+          }, 2000);
+        }, 500);
+      });
+    }, 500);
+  }, [breatheOpacity, breatheScale]);
 
   const playVoice = (text: string) => {
     if (Platform.OS === "web" && "speechSynthesis" in window) {
@@ -126,7 +127,7 @@ export default function OnboardingScreen() {
     if (currentStep === "breathing") {
       startBreathingSequence();
     }
-  }, [currentStep]);
+  }, [currentStep, startBreathingSequence]);
 
   const handleSkipBreathing = () => {
     if (Platform.OS === "web") {
@@ -268,7 +269,7 @@ export default function OnboardingScreen() {
           ]}
         >
           <LinearGradient
-            colors={["rgba(255,255,255,0.9)", "rgba(255,255,255,0.5)"]}
+            colors={["#818CF8", "#6366F1", "#4F46E5"]}
             style={styles.breathingGradient}
           />
         </Animated.View>
@@ -332,8 +333,69 @@ export default function OnboardingScreen() {
     </Animated.View>
   );
 
+  const renderDisclaimerStep = () => (
+    <Animated.View 
+      style={[
+        styles.stepContent,
+        { opacity: fadeAnim, transform: [{ translateY: slideAnim }] }
+      ]}
+    >
+      <View style={styles.disclaimerContainer}>
+        <View style={styles.disclaimerHeader}>
+          <Heart size={32} color="#6366F1" />
+          <Text style={styles.disclaimerTitle}>Before We Begin</Text>
+        </View>
+        
+        <View style={styles.disclaimerScrollContainer}>
+          <View style={styles.disclaimerSection}>
+            <Text style={styles.disclaimerSectionTitle}>1. Professional Disclaimer</Text>
+            <Text style={styles.disclaimerText}>
+              This platform is an AI-driven tool designed for informational and educational purposes only. It does not provide medical, clinical, or professional health advice. Use of this service does not establish a provider-patient relationship. Please consult a qualified professional before making any health-related decisions.
+            </Text>
+          </View>
+
+          <View style={styles.disclaimerSection}>
+            <Text style={styles.disclaimerSectionTitle}>2. Emergency Protocol</Text>
+            <Text style={styles.disclaimerText}>
+              This service is not monitored for emergencies and is not equipped to handle mental health crises or life-threatening situations. If you are in immediate danger or experiencing a crisis, please contact your local emergency services (such as 911 or 112) or a certified crisis hotline immediately.
+            </Text>
+          </View>
+
+          <View style={styles.disclaimerSection}>
+            <Text style={styles.disclaimerSectionTitle}>3. Age Requirements</Text>
+            <Text style={styles.disclaimerText}>
+              Access to this service is strictly limited to individuals aged 18 and older. By continuing, you certify that you meet this age requirement and possess the legal capacity to agree to these terms.
+            </Text>
+          </View>
+
+          <View style={styles.disclaimerSection}>
+            <Text style={styles.disclaimerSectionTitle}>4. Nature of AI (Beta Status)</Text>
+            <Text style={styles.disclaimerText}>
+              This software utilizes experimental AI technology and is currently a work in progress. While we strive for accuracy, the system may occasionally produce incorrect, biased, or inconsistent information.
+            </Text>
+          </View>
+
+          <View style={styles.disclaimerSection}>
+            <Text style={styles.disclaimerSectionTitle}>5. Acknowledgment of Terms</Text>
+            <Text style={styles.disclaimerText}>
+              By selecting the button below, you acknowledge that you have read, understood, and agreed to the terms outlined above, and our Privacy Policy.
+            </Text>
+          </View>
+        </View>
+
+        <TouchableOpacity
+          style={styles.disclaimerButton}
+          onPress={handleNext}
+        >
+          <Text style={styles.disclaimerButtonText}>I Understand</Text>
+        </TouchableOpacity>
+      </View>
+    </Animated.View>
+  );
+
   const getStepContent = () => {
     switch (currentStep) {
+      case "disclaimer": return renderDisclaimerStep();
       case "value": return renderValueProp();
       case "name": return renderNameStep();
       case "permissions": return renderPermissionsStep();
@@ -354,7 +416,7 @@ export default function OnboardingScreen() {
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
       >
-        {currentStep !== "value" && currentStep !== "breathing" && (
+        {currentStep !== "value" && currentStep !== "breathing" && currentStep !== "disclaimer" && (
           <View style={styles.progress}>
             {STEPS.filter(s => s !== "value").map((step, index) => (
               <View
@@ -381,6 +443,55 @@ const styles = StyleSheet.create({
   gradient: {
     flex: 1,
     paddingTop: Platform.OS === "ios" ? 60 : 40,
+  },
+  disclaimerContainer: {
+    flex: 1,
+    width: "100%",
+    paddingHorizontal: 8,
+  },
+  disclaimerHeader: {
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  disclaimerTitle: {
+    fontSize: 24,
+    fontWeight: "700" as const,
+    color: "#1A1A1A",
+    marginTop: 12,
+  },
+  disclaimerScrollContainer: {
+    flex: 1,
+    backgroundColor: "rgba(255,255,255,0.85)",
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 20,
+  },
+  disclaimerSection: {
+    marginBottom: 16,
+  },
+  disclaimerSectionTitle: {
+    fontSize: 14,
+    fontWeight: "600" as const,
+    color: "#6366F1",
+    marginBottom: 6,
+  },
+  disclaimerText: {
+    fontSize: 13,
+    color: "#4A4A4A",
+    lineHeight: 20,
+  },
+  disclaimerButton: {
+    backgroundColor: "#6366F1",
+    paddingHorizontal: 32,
+    paddingVertical: 16,
+    borderRadius: 30,
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  disclaimerButtonText: {
+    fontSize: 16,
+    fontWeight: "600" as const,
+    color: "#FFFFFF",
   },
   progress: {
     flexDirection: "row",
@@ -542,6 +653,11 @@ const styles = StyleSheet.create({
     height: 200,
     borderRadius: 100,
     overflow: "hidden",
+    shadowColor: "#6366F1",
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.5,
+    shadowRadius: 30,
+    elevation: 10,
   },
   breathingGradient: {
     flex: 1,
