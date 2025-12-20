@@ -45,7 +45,7 @@ export default function LaunchSelector() {
     try {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     } catch {}
-    router.replace("/(tabs)/(home)" as any);
+    router.replace("/(tabs)/(home)/home" as any);
   };
 
   if (isLoading) {

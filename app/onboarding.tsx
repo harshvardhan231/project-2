@@ -144,7 +144,7 @@ export default function OnboardingScreen() {
       await setUser({ name: name.trim() });
     }
     await setHasCompletedOnboarding(true);
-    router.replace("/(tabs)/(home)" as any);
+    router.replace("/(tabs)/(home)/home" as any);
   };
 
   const handleSkipName = () => {
