@@ -926,7 +926,7 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   userMessageIcon: {
-    backgroundColor: "#10B981",
+    backgroundColor: "#8B5CF6",
     marginRight: 0,
     marginLeft: 8,
   },
@@ -939,9 +939,11 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   userMessageBubble: {
-    backgroundColor: "#10B981",
+    backgroundColor: "rgba(139, 92, 246, 0.9)",
+    borderRadius: 16,
     borderBottomLeftRadius: 16,
     borderBottomRightRadius: 4,
+    borderWidth: 0,
   },
   errorMessageBubble: {
     borderWidth: 1,
