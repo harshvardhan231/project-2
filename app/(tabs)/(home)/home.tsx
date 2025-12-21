@@ -24,6 +24,7 @@ import * as Haptics from "expo-haptics";
 import { colors } from "@/constants/colors";
 import { useUser } from "@/providers/UserProvider";
 import { useJournal } from "@/providers/JournalProvider";
+import { useAnalytics } from "@/providers/AnalyticsProvider";
 import { AuroraBackground } from "@/components/AuroraBackground";
 import { GlassCard } from "@/components/GlassCard";
 import type { Mood } from "@/types";
@@ -46,6 +47,7 @@ export default function HomeScreen() {
     saveCheckin,
     isLoading: journalLoading 
   } = useJournal();
+  const { trackCheckinCompleted } = useAnalytics();
   
   const [greeting, setGreeting] = useState("");
   const [selectedMood, setSelectedMood] = useState<Mood | null>(null);
@@ -105,6 +107,7 @@ export default function HomeScreen() {
       action: undefined,
     });
 
+    trackCheckinCompleted(mood);
     setShowExpanded(true);
   };
 

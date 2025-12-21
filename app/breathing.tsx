@@ -11,12 +11,15 @@ import { router } from "expo-router";
 import { ArrowLeft, Play, Pause, RotateCcw } from "lucide-react-native";
 import { colors } from "@/constants/colors";
 import { BreathingAnimation } from "@/components/BreathingAnimation";
+import { useAnalytics } from "@/providers/AnalyticsProvider";
 
 export default function BreathingScreen() {
   const [isActive, setIsActive] = useState(false);
   const [timeLeft, setTimeLeft] = useState(120); // 2 minutes default
   const [selectedDuration, setSelectedDuration] = useState(120);
   const [phase, setPhase] = useState<"inhale" | "hold" | "exhale">("inhale");
+  
+  const { trackBreathingExerciseStarted, trackBreathingExerciseCompleted } = useAnalytics();
   
   const durations = [
     { label: "2 min", value: 120 },
@@ -33,10 +36,11 @@ export default function BreathingScreen() {
       }, 1000);
     } else if (timeLeft === 0) {
       setIsActive(false);
+      trackBreathingExerciseCompleted(selectedDuration);
     }
     
     return () => clearInterval(interval);
-  }, [isActive, timeLeft]);
+  }, [isActive, timeLeft, selectedDuration, trackBreathingExerciseCompleted]);
 
   useEffect(() => {
     let phaseInterval: ReturnType<typeof setInterval>;
@@ -56,6 +60,7 @@ export default function BreathingScreen() {
 
   const handleStart = () => {
     setIsActive(true);
+    trackBreathingExerciseStarted(selectedDuration);
   };
 
   const handlePause = () => {

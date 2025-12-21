@@ -14,6 +14,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { Heart, Sparkles, ChevronRight, Bell, Mic } from "lucide-react-native";
 import { colors } from "@/constants/colors";
 import { useUser } from "@/providers/UserProvider";
+import { useAnalytics } from "@/providers/AnalyticsProvider";
 import * as Haptics from "expo-haptics";
 
 const STEPS = ["disclaimer", "value", "name", "permissions", "breathing", "greeting"] as const;
@@ -23,6 +24,7 @@ export default function OnboardingScreen() {
   const [currentStep, setCurrentStep] = useState<Step>("disclaimer");
   const [name, setName] = useState("");
   const { setUser, setHasCompletedOnboarding } = useUser();
+  const { trackOnboardingComplete } = useAnalytics();
   
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(50)).current;
@@ -145,6 +147,7 @@ export default function OnboardingScreen() {
       await setUser({ name: name.trim() });
     }
     await setHasCompletedOnboarding(true);
+    trackOnboardingComplete(name.trim() || undefined);
     router.replace("/(tabs)/(home)/home" as any);
   };
 

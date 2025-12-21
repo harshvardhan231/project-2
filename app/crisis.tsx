@@ -11,6 +11,7 @@ import {
 import { router } from "expo-router";
 import { Phone, Heart, MessageCircle, X } from "lucide-react-native";
 import { colors } from "@/constants/colors";
+import { useAnalytics } from "@/providers/AnalyticsProvider";
 
 const CRISIS_HOTLINES = [
   { name: "National Suicide Prevention Lifeline", number: "988", country: "US" },
@@ -21,6 +22,12 @@ const CRISIS_HOTLINES = [
 ];
 
 export default function CrisisScreen() {
+  const { trackCrisisResourcesViewed } = useAnalytics();
+
+  React.useEffect(() => {
+    trackCrisisResourcesViewed();
+  }, [trackCrisisResourcesViewed]);
+
   const handleCallHotline = (number: string) => {
     const phoneNumber = number.replace(/[^0-9]/g, "");
     Linking.openURL(`tel:${phoneNumber}`);
@@ -51,9 +58,9 @@ export default function CrisisScreen() {
           <Heart size={64} color={colors.white} />
         </View>
 
-        <Text style={styles.title}>We're Here for You</Text>
+        <Text style={styles.title}>We&apos;re Here for You</Text>
         <Text style={styles.subtitle}>
-          If you're in immediate danger, please call your local emergency number (911, 112, 999)
+          If you&apos;re in immediate danger, please call your local emergency number (911, 112, 999)
         </Text>
 
         <View style={styles.emergencyCard}>

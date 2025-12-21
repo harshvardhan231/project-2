@@ -13,11 +13,13 @@ import { router } from "expo-router";
 import { Download, FileJson, FileText, X } from "lucide-react-native";
 import { colors } from "@/constants/colors";
 import { useJournal } from "@/providers/JournalProvider";
+import { useAnalytics } from "@/providers/AnalyticsProvider";
 import * as FileSystem from "expo-file-system/legacy";
 import * as Sharing from "expo-sharing";
 
 export default function ExportScreen() {
   const { entries, checkins } = useJournal();
+  const { trackDataExported } = useAnalytics();
   const [isExporting, setIsExporting] = useState(false);
 
   const handleExportJSON = async () => {
@@ -46,6 +48,7 @@ export default function ExportScreen() {
         await Sharing.shareAsync(fileUri);
       }
 
+      trackDataExported();
       Alert.alert("Success", "Your data has been exported");
     } catch (error) {
       console.error("Export error:", error);

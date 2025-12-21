@@ -6,6 +6,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { JournalProvider } from "@/providers/JournalProvider";
 import { AudioProvider } from "@/providers/AudioProvider";
 import { UserProvider } from "@/providers/UserProvider";
+import { AnalyticsProvider } from "@/providers/AnalyticsProvider";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -42,13 +43,15 @@ export default function RootLayout() {
   return (
     <QueryClientProvider client={queryClient}>
       <GestureHandlerRootView style={{ flex: 1 }}>
-        <UserProvider>
-          <AudioProvider>
-            <JournalProvider>
-              <RootLayoutNav />
-            </JournalProvider>
-          </AudioProvider>
-        </UserProvider>
+        <AnalyticsProvider>
+          <UserProvider>
+            <AudioProvider>
+              <JournalProvider>
+                <RootLayoutNav />
+              </JournalProvider>
+            </AudioProvider>
+          </UserProvider>
+        </AnalyticsProvider>
       </GestureHandlerRootView>
     </QueryClientProvider>
   );

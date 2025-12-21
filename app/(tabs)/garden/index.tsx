@@ -10,12 +10,13 @@ import {
   Platform,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
-import { Flower2, Heart, Sparkles, Volume2, VolumeX } from "lucide-react-native";
+import { Flower2, Sparkles, Volume2, VolumeX } from "lucide-react-native";
 import { colors } from "@/constants/colors";
 import { useAudio } from "@/providers/AudioProvider";
+import { useAnalytics } from "@/providers/AnalyticsProvider";
 import * as Haptics from "expo-haptics";
 
-const { width, height } = Dimensions.get("window");
+Dimensions.get("window");
 
 interface Flower {
   id: string;
@@ -32,29 +33,26 @@ export default function GardenScreen() {
   const [isPlaying, setIsPlaying] = useState(false);
   const breathAnimation = useRef(new Animated.Value(1)).current;
   const { isPlaying: isMusicPlaying, toggleMusic } = useAudio();
+  const { trackGardenSessionStarted, trackGardenSessionEnded } = useAnalytics();
 
   useEffect(() => {
     if (isPlaying) {
-      startBreathingAnimation();
+      Animated.loop(
+        Animated.sequence([
+          Animated.timing(breathAnimation, {
+            toValue: 1.2,
+            duration: 4000,
+            useNativeDriver: true,
+          }),
+          Animated.timing(breathAnimation, {
+            toValue: 1,
+            duration: 4000,
+            useNativeDriver: true,
+          }),
+        ])
+      ).start();
     }
-  }, [isPlaying]);
-
-  const startBreathingAnimation = () => {
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(breathAnimation, {
-          toValue: 1.2,
-          duration: 4000,
-          useNativeDriver: true,
-        }),
-        Animated.timing(breathAnimation, {
-          toValue: 1,
-          duration: 4000,
-          useNativeDriver: true,
-        }),
-      ])
-    ).start();
-  };
+  }, [isPlaying, breathAnimation]);
 
   const panResponder = useRef(
     PanResponder.create({
@@ -114,9 +112,11 @@ export default function GardenScreen() {
     setIsPlaying(true);
     setFlowers([]);
     setScore(0);
+    trackGardenSessionStarted();
   };
 
   const handleEnd = () => {
+    trackGardenSessionEnded(score);
     setIsPlaying(false);
   };
 
