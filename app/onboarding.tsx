@@ -8,6 +8,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   Animated,
+  ScrollView,
 } from "react-native";
 import { router } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
@@ -349,7 +350,11 @@ export default function OnboardingScreen() {
           <Text style={styles.disclaimerTitle}>Before We Begin</Text>
         </View>
         
-        <View style={styles.disclaimerScrollContainer}>
+        <ScrollView 
+          style={styles.disclaimerScrollContainer}
+          contentContainerStyle={styles.disclaimerScrollContent}
+          showsVerticalScrollIndicator={true}
+        >
           <View style={styles.disclaimerSection}>
             <Text style={styles.disclaimerSectionTitle}>1. Professional Disclaimer</Text>
             <Text style={styles.disclaimerText}>
@@ -384,7 +389,7 @@ export default function OnboardingScreen() {
               By selecting the button below, you acknowledge that you have read, understood, and agreed to the terms outlined above, and our Privacy Policy.
             </Text>
           </View>
-        </View>
+        </ScrollView>
 
         <TouchableOpacity
           style={styles.disclaimerButton}
@@ -466,8 +471,11 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "rgba(255,255,255,0.85)",
     borderRadius: 16,
-    padding: 20,
     marginBottom: 20,
+  },
+  disclaimerScrollContent: {
+    padding: 20,
+    paddingBottom: 30,
   },
   disclaimerSection: {
     marginBottom: 16,
