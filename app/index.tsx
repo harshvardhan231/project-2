@@ -7,9 +7,10 @@ import {
   Dimensions,
   ActivityIndicator,
 } from "react-native";
+import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
-import { BookOpen, MessageSquare, Sparkles } from "lucide-react-native";
+import { BookOpen, MessageSquare } from "lucide-react-native";
 import * as Haptics from "expo-haptics";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useUser } from "@/providers/UserProvider";
@@ -71,9 +72,11 @@ export default function LaunchSelector() {
     <AuroraBackground>
       <View style={[styles.container, { paddingTop: insets.top + 40 }]}>
         <View style={styles.header}>
-          <View style={styles.sparkleContainer}>
-            <Sparkles size={28} color="#6366F1" />
-          </View>
+          <Image
+            source={{ uri: "https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/dqwdzb4tgaq9omsxtercf" }}
+            style={styles.logoImage}
+            contentFit="contain"
+          />
           <Text style={styles.greeting}>
             {getTimeBasedGreeting()}, {user?.name || "there"}
           </Text>
@@ -154,13 +157,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 48,
   },
-  sparkleContainer: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: "rgba(99, 102, 241, 0.1)",
-    alignItems: "center",
-    justifyContent: "center",
+  logoImage: {
+    width: 140,
+    height: 140,
     marginBottom: 20,
   },
   greeting: {
