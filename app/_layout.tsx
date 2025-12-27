@@ -7,6 +7,7 @@ import { JournalProvider } from "@/providers/JournalProvider";
 import { AudioProvider } from "@/providers/AudioProvider";
 import { UserProvider } from "@/providers/UserProvider";
 import { AnalyticsProvider } from "@/providers/AnalyticsProvider";
+import { ChatProvider } from "@/providers/ChatProvider";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -32,6 +33,8 @@ function RootLayoutNav() {
       <Stack.Screen name="breathing" options={{ headerShown: false }} />
       <Stack.Screen name="garden" options={{ headerShown: false }} />
       <Stack.Screen name="voice-chat" options={{ headerShown: false, presentation: "fullScreenModal" }} />
+      <Stack.Screen name="chat-history" options={{ headerShown: false }} />
+      <Stack.Screen name="chat-detail" options={{ headerShown: false }} />
     </Stack>
   );
 }
@@ -48,7 +51,9 @@ export default function RootLayout() {
           <UserProvider>
             <AudioProvider>
               <JournalProvider>
-                <RootLayoutNav />
+                <ChatProvider>
+                  <RootLayoutNav />
+                </ChatProvider>
               </JournalProvider>
             </AudioProvider>
           </UserProvider>

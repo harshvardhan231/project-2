@@ -18,7 +18,7 @@ import {
   Animated,
   Easing,
 } from "react-native";
-import { Send, Bot, User, Sparkles, TrendingUp, Calendar, BookOpen, Leaf, Mic, MicOff, Phone, PhoneOff, WifiOff, RefreshCw } from "lucide-react-native";
+import { Send, Bot, User, Sparkles, TrendingUp, Calendar, BookOpen, Leaf, Mic, MicOff, Phone, PhoneOff, WifiOff, RefreshCw, History } from "lucide-react-native";
 import { Audio } from "expo-av";
 import * as Speech from "expo-speech";
 import NetInfo from "@react-native-community/netinfo";
@@ -141,6 +141,7 @@ export default function InsightsScreen() {
         clearTimeout(timeoutRef.current);
       }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Run once on mount
 
   const checkNetworkStatus = async () => {
@@ -802,6 +803,14 @@ export default function InsightsScreen() {
           ]}>
             <View style={styles.inputActionsRow}>
               <TouchableOpacity
+                style={styles.historyButton}
+                onPress={() => router.push("/chat-history")}
+                activeOpacity={0.7}
+                testID="history-button"
+              >
+                <History size={18} color="#8B5CF6" />
+              </TouchableOpacity>
+              <TouchableOpacity
                 style={styles.callModeButton}
                 onPress={startCall}
                 activeOpacity={0.7}
@@ -1100,6 +1109,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "rgba(99, 102, 241, 0.12)",
+  },
+  historyButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "rgba(139, 92, 246, 0.12)",
   },
   callContainer: {
     flex: 1,

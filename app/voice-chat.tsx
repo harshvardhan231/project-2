@@ -28,6 +28,7 @@ import * as Haptics from "expo-haptics";
 import { router } from "expo-router";
 import { useJournal } from "@/providers/JournalProvider";
 import { useUser } from "@/providers/UserProvider";
+import { useChat } from "@/providers/ChatProvider";
 import { generatePersonalizedInsight, AIChatMessage } from "@/utils/ai";
 
 
@@ -42,6 +43,15 @@ interface VoiceMessage {
 export default function VoiceChatScreen() {
   const { entries, checkins } = useJournal();
   const { user, privacyMode } = useUser();
+  const { 
+    createSession, 
+    addMessageToSession, 
+    extractMemoriesFromSession,
+    generateSessionTitle,
+    getMemoryContext,
+  } = useChat();
+  
+  const sessionIdRef = useRef<string | null>(null);
   
   const [isListening, setIsListening] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
@@ -60,7 +70,14 @@ export default function VoiceChatScreen() {
   const messagesRef = useRef<VoiceMessage[]>([]);
 
   useEffect(() => {
+    const initSession = async () => {
+      const session = await createSession("voice");
+      sessionIdRef.current = session.id;
+      console.log("[VoiceChat] Created session:", session.id);
+    };
+    
     setupAudio();
+    initSession();
     
     Animated.timing(fadeAnim, {
       toValue: 1,
@@ -476,6 +493,10 @@ export default function VoiceChatScreen() {
       messagesRef.current = updated;
       return updated;
     });
+    
+    if (sessionIdRef.current) {
+      await addMessageToSession(sessionIdRef.current, { role: "user", content: text });
+    }
 
     setStatusText("Thinking...");
 
@@ -486,12 +507,15 @@ export default function VoiceChatScreen() {
           role: m.role,
           content: m.content,
         }));
+      
+      const memoryContext = getMemoryContext();
 
       const response = await generatePersonalizedInsight(
         entries,
         checkins,
         text,
-        historyForAI
+        historyForAI,
+        memoryContext
       );
 
       console.log("[VoiceChat] AI response received");
@@ -508,6 +532,14 @@ export default function VoiceChatScreen() {
         messagesRef.current = updated;
         return updated;
       });
+      
+      if (sessionIdRef.current) {
+        await addMessageToSession(sessionIdRef.current, { role: "assistant", content: response });
+        
+        if (messagesRef.current.length === 3) {
+          generateSessionTitle(sessionIdRef.current);
+        }
+      }
 
       speakText(response);
     } catch (error) {
@@ -527,7 +559,10 @@ export default function VoiceChatScreen() {
     }
   };
 
-  const handleEndCall = () => {
+  const handleEndCall = async () => {
+    if (sessionIdRef.current && messagesRef.current.length > 2) {
+      extractMemoriesFromSession(sessionIdRef.current);
+    }
     cleanup();
     router.back();
   };

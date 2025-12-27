@@ -37,3 +37,28 @@ export interface LLMSummary {
   themes: string[];
   action: string;
 }
+
+export interface ChatMessage {
+  id: string;
+  role: "user" | "assistant";
+  content: string;
+  timestamp: string;
+}
+
+export interface ChatSession {
+  id: string;
+  type: "text" | "voice";
+  title: string;
+  messages: ChatMessage[];
+  createdAt: string;
+  updatedAt: string;
+  summary?: string;
+}
+
+export interface AIMemory {
+  id: string;
+  content: string;
+  category: "preference" | "emotion" | "goal" | "insight" | "concern";
+  createdAt: string;
+  source: "chat" | "voice" | "journal";
+}

@@ -107,7 +107,8 @@ export async function generatePersonalizedInsight(
   entries: JournalEntry[], 
   checkins: CheckIn[], 
   question: string,
-  conversationHistory: AIChatMessage[] = []
+  conversationHistory: AIChatMessage[] = [],
+  memoryContext: string = ""
 ): Promise<string> {
   const recentEntries = entries.slice(0, 10);
   const recentCheckins = checkins.slice(0, 14);
@@ -145,7 +146,7 @@ Immediately respond with care: "I'm really concerned about what you're sharing. 
 When someone seems to need more help:
 "It sounds like you're going through a lot. Have you thought about talking to a therapist? They could offer support I can't. I'm here for everyday stress, but a professional might really help with this."
 
-You have access to their recent journal entries and check-ins for background context.`;
+You have access to their recent journal entries and check-ins for background context.${memoryContext}`;
 
   const contextMessage = `Here's some background context about me:
 
