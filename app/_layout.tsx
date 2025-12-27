@@ -31,6 +31,7 @@ function RootLayoutNav() {
       <Stack.Screen name="summary" options={{ headerShown: false }} />
       <Stack.Screen name="breathing" options={{ headerShown: false }} />
       <Stack.Screen name="garden" options={{ headerShown: false }} />
+      <Stack.Screen name="voice-chat" options={{ headerShown: false, presentation: "fullScreenModal" }} />
     </Stack>
   );
 }

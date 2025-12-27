@@ -265,7 +265,7 @@ export default function HomeScreen() {
 
               <TouchableOpacity 
                 style={styles.quickAction}
-                onPress={() => router.push("/(tabs)/insights" as any)}
+                onPress={() => router.push("/voice-chat" as any)}
               >
                 <LinearGradient
                   colors={["#10B981", "#059669"]}
@@ -273,7 +273,7 @@ export default function HomeScreen() {
                 >
                   <Phone size={24} color="#fff" />
                 </LinearGradient>
-                <Text style={styles.quickActionLabel}>Call</Text>
+                <Text style={styles.quickActionLabel}>Voice</Text>
               </TouchableOpacity>
 
               <TouchableOpacity 
